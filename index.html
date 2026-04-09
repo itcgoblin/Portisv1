@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Portis Ghost Box</title>
+  <style>
+    body {
+      background: #0b0f0e;
+      color: #71dfb4;
+      font-family: monospace;
+      text-align: center;
+      padding: 40px;
+    }
+
+    button {
+      background: #142720;
+      color: #71dfb4;
+      border: 1px solid #2a3933;
+      padding: 12px 20px;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    input {
+      width: 300px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>PORTIS GHOST BOX</h1>
+
+<button onclick="start()">Start</button>
+<button onclick="stop()">Stop</button>
+
+<br><br>
+
+<label>Scan Speed</label><br>
+<input id="speed" type="range" min="30" max="200" value="80">
+
+<script>
+let audioCtx;
+let interval;
+
+function init() {
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AC();
+  }
+}
+
+function noiseBurst() {
+  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < data.length; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer;
+
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.3;
+
+  source.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  source.start();
+}
+
+function start() {
+  init();
+
+  interval = setInterval(() => {
+    noiseBurst();
+  }, document.getElementById("speed").value);
+}
+
+function stop() {
+  clearInterval(interval);
+}
+</script>
+
+</body>
+</html>
